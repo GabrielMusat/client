@@ -40,6 +40,10 @@ def send_instruction(to_send):
             retrieve_file(to_send['filename'])
             print('file {} uploaded to octoprint'.format(to_send['filename']))
 
+        elif instruction == 'command':
+            octoapi.post_command(to_send['command'])
+            print('executing command {}'.format(to_send['command']))
+
     except Exception as e:
         print('imposible to connect to octoprint')
         print(e)

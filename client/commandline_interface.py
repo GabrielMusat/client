@@ -1,7 +1,7 @@
 import requests
 import json
 
-Artenea_URL = 'http://192.168.1.53:8000'
+Artenea_URL = 'http://remotemusat.ddns.net:8000'
 auth = ('Jose Luis', 'contrasenaJL')
 
 
@@ -10,6 +10,17 @@ def home():
         payload = {'instruction': 'home'}
         requests.post(Artenea_URL + '/add', data=json.dumps(payload), auth=auth)
         print('Usuario aprieta el boton home desde su ordenador a traves de la pagina web de Artenea')
+
+    except Exception as e:
+        print('error al conectar con el servidor de artenea:')
+        print(e)
+
+
+def command(command):
+    try:
+        payload = {'instruction': 'command', 'command': command.upper()}
+        requests.post(Artenea_URL + '/add', data=json.dumps(payload), auth=auth)
+        print('usuario ejecuta el comando {}'.format(command))
 
     except Exception as e:
         print('error al conectar con el servidor de artenea:')
@@ -40,7 +51,6 @@ def register(user, password):
 
 def upload_file(filename):
     try:
-        file = {'file': open(filename, 'rb')}
         payload = {'instruction': 'download', 'filename': filename}
         requests.post(Artenea_URL + '/add', data=json.dumps(payload), auth=auth)
         print('usuario sube un gcode')
