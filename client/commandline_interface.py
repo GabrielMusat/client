@@ -63,7 +63,7 @@ def file_server_to_printer(filename):
 def file_client_to_server(filename):
     try:
         file = {'file': open(filename, 'rb')}
-        r = requests.post(Artenea_URL + '/upload', file=file, auth=auth)
+        r = requests.post(Artenea_URL + '/upload', files=file, auth=auth)
         print(r.status_code)
 
     except Exception as e:
