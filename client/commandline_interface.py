@@ -8,8 +8,8 @@ auth = ('Jose Luis', 'contrasenaJL')
 def home():
     try:
         payload = {'instruction': 'home'}
-        requests.post(Artenea_URL + '/add', data=json.dumps(payload), auth=auth)
-        print('Usuario aprieta el boton home desde su ordenador a traves de la pagina web de Artenea')
+        r = requests.post(Artenea_URL + '/add', data=json.dumps(payload), auth=auth)
+        print(r.status_code)
 
     except Exception as e:
         print('error al conectar con el servidor de artenea:')
@@ -19,8 +19,8 @@ def home():
 def command(command):
     try:
         payload = {'instruction': 'command', 'command': command.upper()}
-        requests.post(Artenea_URL + '/add', data=json.dumps(payload), auth=auth)
-        print('usuario ejecuta el comando {}'.format(command))
+        r = requests.post(Artenea_URL + '/add', data=json.dumps(payload), auth=auth)
+        print(r.status_code)
 
     except Exception as e:
         print('error al conectar con el servidor de artenea:')
@@ -30,8 +30,8 @@ def command(command):
 def print_file(file):
     try:
         payload = {'instruction': 'print', 'file': file}
-        requests.post(Artenea_URL + '/add', data=json.dumps(payload), auth=auth)
-        print('Usuario pide que se imprima su modelo llamado "{}"'.format(file))
+        r = requests.post(Artenea_URL + '/add', data=json.dumps(payload), auth=auth)
+        print(r.status_code)
 
     except Exception as e:
         print('error al conectar con el servidor de artenea:')
@@ -41,21 +41,31 @@ def print_file(file):
 def register(user, password):
     try:
         payload = {user: password}
-        requests.post(Artenea_URL + '/register', data=json.dumps(payload), auth=auth)
-        print(f'nuevo usuario {user} registrado')
+        r = requests.post(Artenea_URL + '/register', data=json.dumps(payload), auth=auth)
+        print(r.status_code)
 
     except Exception as e:
         print('no se ha podido registrar nuevo usuario:')
         print(e)
 
 
-def upload_file(filename):
+def file_server_to_printer(filename):
     try:
         payload = {'instruction': 'download', 'filename': filename}
-        requests.post(Artenea_URL + '/add', data=json.dumps(payload), auth=auth)
-        print('usuario sube un gcode')
+        r = requests.post(Artenea_URL + '/add', data=json.dumps(payload), auth=auth)
+        print(r.status_code)
 
     except Exception as e:
         print('error al subir gcode:')
         print(e)
 
+
+def file_client_to_server(filename):
+    try:
+        file = {'file': open(filename, 'rb')}
+        r = requests.post(Artenea_URL + '/upload', file=file, auth=auth)
+        print(r.status_code)
+
+    except Exception as e:
+        print('error al subir gcode a impresora:')
+        print(e)
