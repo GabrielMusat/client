@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 
 Artenea_URL = 'http://remotemusat.ddns.net:8000'
 auth = ('Jose Luis', 'contrasenaJL')
@@ -69,3 +70,10 @@ def file_client_to_server(filename):
     except Exception as e:
         print('error al subir gcode a impresora:')
         print(e)
+
+
+def print3d(filepath):
+    file_client_to_server(filepath)
+    filename = os.path.split(filepath)[1]
+    file_server_to_printer(filename)
+    print_file(filename)
