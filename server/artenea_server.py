@@ -2,7 +2,6 @@ from flask import Flask, request, send_file
 from flask_httpauth import HTTPBasicAuth
 from flask_cors import CORS, cross_origin
 from OpenSSL import SSL
-import utils
 import json
 import os
 
@@ -10,9 +9,9 @@ config = json.loads(open('artenea_server.conf').read())
 users = json.loads(open('UsersDDBB.conf').read())
 admins = json.loads(open('AdminsDDBB.conf').read())
 
-#context = SSL.Context(SSL.SSLv23_METHOD)
-#context.use_privatekey_file('yourserver.key')
-#context.use_certificate_file('yourserver.crt')
+# context = SSL.Context(SSL.SSLv23_METHOD)
+# context.use_privatekey_file('yourserver.key')
+# context.use_certificate_file('yourserver.crt')
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -121,7 +120,7 @@ def upload_file():
         folder = 'users/' + user + '/uploads'
         file = request.files['file']
         if '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() == 'gcode':
-            utils.maybe_create(folder)
+            if not os.path.exists(folder): os.makedirs(folder)
             file.save(os.path.join(folder, file.filename))
             return json.dumps({'status': 'gcode uploaded correctly'})
 

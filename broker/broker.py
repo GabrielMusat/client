@@ -3,7 +3,7 @@
 
 import requests
 import json
-import octoapi
+import octoapi as octoapi
 import time
 
 config = json.loads(open('broker.conf').read())
@@ -22,6 +22,10 @@ def retrieve_file(filename):
         for chunk in r.iter_content(chunk_size=1024):
             f.write(chunk)
         f.close()
+
+
+def temp():
+    return octoapi
 
 
 def send_instruction(to_send):
@@ -52,6 +56,7 @@ def send_instruction(to_send):
 def main():
     while True:
         try:
+            params = json.dumps({'temp': temp(), 'print_percentage': print_percentage()})
             r = requests.get(Artenea_URL + '/buffer', auth=(username, password))
             to_send = r.json()
 
@@ -70,4 +75,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    temp()
