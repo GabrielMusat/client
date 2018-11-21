@@ -71,9 +71,9 @@ def register():
         return 'failed'
 
 
-@app.route('/users', methods=['POST'])
+@app.route('/users', methods=['GET'])
 @cross_origin()
-def users():
+def get_users():
     return json.dumps(users, indent=4)
 
 
