@@ -71,6 +71,12 @@ def register():
         return 'failed'
 
 
+@app.route('/users', methods=['POST'])
+@cross_origin()
+def users():
+    return json.dumps(users, indent=4)
+
+
 @app.route('/buffer', methods=['GET'])
 @auth_user.login_required
 @cross_origin()
