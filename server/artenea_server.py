@@ -23,7 +23,7 @@ buffer_out = {}
 buffer_in = {}
 for user_name in users:
     buffer_out[user_name] = []
-    buffer_in[user_name] = {}
+    buffer_in[user_name] = {'temp': -1, 'job': -1}
 
 
 @auth_user.get_password
@@ -99,16 +99,17 @@ def return_buffer():
 @app.route('/stats', methods=['GET'])
 @auth_user.login_required
 @cross_origin()
-def return_buffer():
+def stats():
     global buffer_in
     user = auth_user.username()
     return json.dumps(buffer_in[user], indent=4)
 
 
 @app.route('/full_stats', methods=['GET'])
-def return_buffer():
+@cross_origin()
+def full_stats():
     global buffer_in
-    return json.dumps(buffer_in, indent=4)
+    return json.dumps(buffer_in['Jose Luis'], indent=4)
 
 
 @app.route('/add', methods=['POST'])
