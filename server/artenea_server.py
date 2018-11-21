@@ -19,9 +19,11 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 auth_user = HTTPBasicAuth()
 auth_admin = HTTPBasicAuth()
 
-buffer = {}
+buffer_out = {}
+buffer_in = {}
 for user_name in users:
-    buffer[user_name] = []
+    buffer_out[user_name] = []
+    buffer_in[user_name] = {}
 
 
 @auth_user.get_password
@@ -55,7 +57,7 @@ def register():
                 print('user already registered')
             else:
                 users[new_user] = new_users[new_user]
-                buffer[new_user] = []
+                buffer_out[new_user] = []
                 with open('UsersDDBB.conf', 'w') as UsersDDBB:
                     UsersDDBB.write(json.dumps(users, indent=4))
 
@@ -80,28 +82,44 @@ def get_users():
 @auth_user.login_required
 @cross_origin()
 def return_buffer():
-    global buffer
+    global buffer_out
+    global buffer_in
     user = auth_user.username()
-
-    if len(buffer[user]) > 0:
-        to_return = buffer[user][0]
+    buffer_in[user] = {'temp': request.args.get('temp'), 'job': request.args.get('job')}
+    if len(buffer_out[user]) > 0:
+        to_return = buffer_out[user][0]
         print('sending instruction and deleting it from buffer')
-        del buffer[user][0]
+        del buffer_out[user][0]
         return to_return
 
     else:
         return json.dumps({'instruction': 'None'})
 
 
+@app.route('/stats', methods=['GET'])
+@auth_user.login_required
+@cross_origin()
+def return_buffer():
+    global buffer_in
+    user = auth_user.username()
+    return json.dumps(buffer_in[user], indent=4)
+
+
+@app.route('/full_stats', methods=['GET'])
+def return_buffer():
+    global buffer_in
+    return json.dumps(buffer_in, indent=4)
+
+
 @app.route('/add', methods=['POST'])
 @auth_user.login_required
 @cross_origin()
 def add_to_buffer():
-    global buffer
+    global buffer_out
     try:
         json_instruction = request.data
         user = auth_user.username()
-        buffer[user].append(json_instruction)
+        buffer_out[user].append(json_instruction)
         print('json added to buffer')
         return json.dumps({'status': 'ok'})
 

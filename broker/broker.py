@@ -25,7 +25,11 @@ def retrieve_file(filename):
 
 
 def temp():
-    return octoapi
+    return int(octoapi.get_tool_dict()['tool0']['actual'])
+
+
+def print_percentage():
+    return int(octoapi.get_completion())
 
 
 def send_instruction(to_send):
@@ -56,8 +60,8 @@ def send_instruction(to_send):
 def main():
     while True:
         try:
-            params = json.dumps({'temp': temp(), 'print_percentage': print_percentage()})
-            r = requests.get(Artenea_URL + '/buffer', auth=(username, password))
+            params = {'temp': temp(), 'job': print_percentage()}
+            r = requests.get(Artenea_URL + '/buffer', params=params, auth=(username, password))
             to_send = r.json()
 
             if to_send['instruction'] == 'None':
@@ -75,5 +79,4 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
-    temp()
+    main()
