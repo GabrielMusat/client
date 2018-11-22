@@ -183,15 +183,14 @@ def upload_file():
         if '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() == 'gcode':
             if not os.path.exists(folder): os.makedirs(folder)
             file.save(os.path.join(folder, file.filename))
-            return json.dumps({'status': 'g-code uploaded correctly'})
+            return f'g-code {file.filename} uploaded correctly'
 
         else:
-            return json.dumps({'status': 'not a g-code'})
+            return 'only .gcode files are allowed'
 
     except Exception as e:
-        print('error al subir gcode:')
-        print(e)
-        return json.dumps({'status': 'error uploading g-code', 'error': str(e)})
+        print('error al subir gcode: ' + str(e))
+        return 'error uploading g-code: ' + str(e)
 
 
 @app.route('/download', methods=['GET'])
@@ -201,13 +200,24 @@ def download_file():
     try:
         user = auth_user.username()
         filename = request.args.get('filename')
-        folder = 'users/' + user + '/uploads'
-        return send_file(folder + '/' + filename)
+        folder = 'gcodes'
+        if not os.path.exists(folder):
+            if not os.path.isfile(filename):
+                return f'g-code {filename} is not in the server'
+
+        user_json_path = os.path.join('users', user + '.json')
+        if not os.path.isfile(user_json_path):
+            return f'user {user} has no right to print this g-code'
+        else:
+            user_json = json.loads(open(user_json_path, 'r').read())
+            if filename in user_json['rights']:
+                return send_file(os.path.join(folder, filename))
+            else:
+                return f'user {user} has no right to print this g-code'
 
     except Exception as e:
-        print('error al mandar gcode a impresora:')
-        print(e)
-        return json.dumps({'file': 'None'})
+        print('error al mandar gcode a impresora: ' + str(e))
+        return 'error al mandar gcode a impresora: ' + str(e)
 
 
 if __name__ == '__main__':
