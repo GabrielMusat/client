@@ -78,6 +78,50 @@ def get_users():
     return json.dumps(users, indent=4)
 
 
+@app.route('/files', methods=['GET'])
+@auth_user.login_required
+@cross_origin()
+def get_files():
+    user = auth_user.username()
+    return json.dumps(os.listdir(os.path.join('users', user, 'uploads')))
+
+
+@app.route('/rights', methods=['POST'])
+@auth_admin.login_required
+@cross_origin()
+def give_rigths():
+    right = json.loads(request.data)
+    user = [k for k in right][0]
+    gcode = right[user]
+    folder = 'users'
+    if not os.path.exists(folder): os.makedirs(folder)
+    user_json_path = os.path.join(folder, user + '.json')
+    if not os.path.isfile(user_json_path):
+        user_json = {'rights': [gcode]}
+        with open(user_json_path, 'w') as f:
+            f.write(json.dumps(user_json, indent=4))
+    else:
+        user_json = json.loads(open(user_json_path, 'r').read())
+        user_json['rights'].append(gcode)
+        with open(user_json_path, 'w') as f:
+            f.write(json.dumps(user_json, indent=4))
+
+    return f'user {user} gcode rights: {json.dumps(user_json["rights"])}'
+
+
+@app.route('/checkrights', methods=['GET'])
+@auth_user.login_required
+@cross_origin()
+def check_rights():
+    user = auth_user.username()
+    user_json_path = os.path.join('users', user + '.json')
+    if os.path.isfile(user_json_path):
+        user_json = json.loads(open(user_json_path, 'r').read())
+        return f'user {user} gcode rights: {json.dumps(user_json["rights"])}'
+    else:
+        return f'user {user} has no gcode rights'
+
+
 @app.route('/buffer', methods=['GET'])
 @auth_user.login_required
 @cross_origin()
@@ -131,25 +175,23 @@ def add_to_buffer():
 
 
 @app.route('/upload', methods=['POST'])
-@auth_user.login_required
 @cross_origin()
 def upload_file():
     try:
-        user = auth_user.username()
-        folder = 'users/' + user + '/uploads'
+        folder = 'gcodes'
         file = request.files['file']
         if '.' in file.filename and file.filename.rsplit('.', 1)[1].lower() == 'gcode':
             if not os.path.exists(folder): os.makedirs(folder)
             file.save(os.path.join(folder, file.filename))
-            return json.dumps({'status': 'gcode uploaded correctly'})
+            return json.dumps({'status': 'g-code uploaded correctly'})
 
         else:
-            return json.dumps({'status': 'not a gcode'})
+            return json.dumps({'status': 'not a g-code'})
 
     except Exception as e:
         print('error al subir gcode:')
         print(e)
-        return json.dumps({'status': 'error uploading gcode', 'error': str(e)})
+        return json.dumps({'status': 'error uploading g-code', 'error': str(e)})
 
 
 @app.route('/download', methods=['GET'])

@@ -21,7 +21,6 @@ def retrieve_file(filename):
     with open(gcodes_folder + '/' + filename, 'wb') as f:
         for chunk in r.iter_content(chunk_size=1024):
             f.write(chunk)
-        f.close()
 
 
 def temp():
