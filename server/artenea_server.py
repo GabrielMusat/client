@@ -78,12 +78,12 @@ def get_users():
     return json.dumps(users, indent=4)
 
 
-@app.route('/files', methods=['GET'])
+@app.route('/gcodes', methods=['GET'])
 @auth_user.login_required
 @cross_origin()
 def get_files():
     user = auth_user.username()
-    return json.dumps(os.listdir(os.path.join('users', user, 'uploads')))
+    return json.dumps(os.listdir('gcodes'))
 
 
 @app.route('/rights', methods=['POST'])
@@ -93,6 +93,8 @@ def give_rigths():
     right = json.loads(request.data)
     user = [k for k in right][0]
     gcode = right[user]
+    if gcode not in os.listdir('gcodes'):
+        return f'gcode {gcode} not uploaded to server'
     folder = 'users'
     if not os.path.exists(folder): os.makedirs(folder)
     user_json_path = os.path.join(folder, user + '.json')
@@ -102,6 +104,8 @@ def give_rigths():
             f.write(json.dumps(user_json, indent=4))
     else:
         user_json = json.loads(open(user_json_path, 'r').read())
+        if gcode in user_json['rights']:
+            return f'user {user} already have gcode rights to {gcode}'
         user_json['rights'].append(gcode)
         with open(user_json_path, 'w') as f:
             f.write(json.dumps(user_json, indent=4))
@@ -150,10 +154,11 @@ def stats():
 
 
 @app.route('/full_stats', methods=['GET'])
+@auth_admin.login_required
 @cross_origin()
 def full_stats():
     global buffer_in
-    return json.dumps(buffer_in['Jose Luis'], indent=4)
+    return json.dumps(buffer_in,  indent=4)
 
 
 @app.route('/add', methods=['POST'])
@@ -175,6 +180,7 @@ def add_to_buffer():
 
 
 @app.route('/upload', methods=['POST'])
+@auth_admin.login_required
 @cross_origin()
 def upload_file():
     try:
@@ -202,8 +208,11 @@ def download_file():
         filename = request.args.get('filename')
         folder = 'gcodes'
         if not os.path.exists(folder):
-            if not os.path.isfile(filename):
-                return f'g-code {filename} is not in the server'
+            return f'there are no g-codes in the server'
+
+        file_path = os.path.join(folder, filename)
+        if not os.path.isfile(file_path):
+            return f'g-code {filename} is not in the server'
 
         user_json_path = os.path.join('users', user + '.json')
         if not os.path.isfile(user_json_path):
@@ -211,7 +220,7 @@ def download_file():
         else:
             user_json = json.loads(open(user_json_path, 'r').read())
             if filename in user_json['rights']:
-                return send_file(os.path.join(folder, filename))
+                return send_file(file_path)
             else:
                 return f'user {user} has no right to print this g-code'
 

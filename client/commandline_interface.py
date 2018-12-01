@@ -108,3 +108,12 @@ def stats(auth=default_auth):
 
     except Exception as e:
         print(f'error al checkear estadísticas: ' + str(e))
+
+
+def gcodes(auth=default_auth):
+    try:
+        r = requests.get(Artenea_URL + '/gcodes', auth=auth)
+        print(f'{r.status_code}: {r.text}')
+
+    except Exception as e:
+        print(f'error al checkear estadísticas: ' + str(e))

@@ -28,7 +28,10 @@ def temp():
 
 
 def print_percentage():
-    return int(octoapi.get_completion())
+    if octoapi.is_printing():
+        return int(octoapi.get_completion())
+    else:
+        return -1
 
 
 def send_instruction(to_send):
