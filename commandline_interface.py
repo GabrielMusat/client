@@ -120,7 +120,8 @@ def gcodes(auth=default_auth):
         print(f'error al checkear estadísticas: ' + str(e))
 
 
-if len(sys.argv) > 1:
+if len(sys.argv) > 1 and sys.argv[1] in ['-c', '--command']:
     while True:
         gcode = input('pandora << ').upper()
+        if gcode == 'EXIT': exit(0)
         command(gcode)
