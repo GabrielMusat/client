@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import sys
 
 Artenea_URL = 'http://remotemusat.ddns.net:8000'
 default_auth = ('Gabriel', 'contrasenaG')
@@ -117,3 +118,9 @@ def gcodes(auth=default_auth):
 
     except Exception as e:
         print(f'error al checkear estadísticas: ' + str(e))
+
+
+if len(sys.argv) > 1:
+    while True:
+        gcode = input('pandora << ').upper()
+        command(gcode)
