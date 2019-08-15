@@ -3,7 +3,7 @@ import json
 import os
 import sys
 
-Artenea_URL = 'http://remotemusat.ddns.net:8000'
+Artenea_URL = 'https://www.servidor3dulab.ovh/api'
 default_auth = ('Gabriel', 'contrasenaG')
 
 
